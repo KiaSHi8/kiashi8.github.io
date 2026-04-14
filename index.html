@@ -12,18 +12,21 @@
             --bg: #0a0a0a;
         }
 
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: var(--bg);
-            font-family: 'Segoe UI', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+       body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--bg);
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* ДОБАВЬ ЭТИ ДВЕ СТРОКИ НИЖЕ: */
+    user-select: none;
+    -webkit-user-select: none;
+}
 
         /* Холст для дождя символов */
         #matrix-canvas {
