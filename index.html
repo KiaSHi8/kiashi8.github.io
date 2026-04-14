@@ -8,80 +8,104 @@
         :root {
             --accent: #9d4edd; 
             --text: #ededed;
+            --bg: #0a0a0a;
         }
 
-        body { 
-            background: #0a0a0a; 
-            color: var(--text); 
-            font-family: 'Segoe UI', sans-serif; 
+        body, html {
             margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg);
+            font-family: 'Segoe UI', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            overflow: hidden; /* Чтобы не было полос прокрутки из-за свечения */
         }
 
-        /* Мягкое свечение за курсором */
-        .cursor-glow {
+        /* Холст для дождя символов */
+        #matrix-canvas {
             position: fixed;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(157, 78, 221, 0.15) 0%, rgba(0,0,0,0) 70%);
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+        /* Затемнение, чтобы текст читался поверх дождя */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(10, 10, 10, 0.7) 0%, rgba(10, 10, 10, 0.9) 100%);
+            z-index: 1;
+        }
+
+        #glow {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(157, 78, 221, 0.2) 0%, rgba(0,0,0,0) 70%);
             border-radius: 50%;
             pointer-events: none;
             transform: translate(-50%, -50%);
-            z-index: 0;
+            z-index: 2;
+            filter: blur(30px);
         }
 
         .container {
             position: relative;
-            z-index: 1;
+            z-index: 3;
             width: 100%;
             max-width: 350px;
             padding: 20px;
+            text-align: center;
         }
 
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         h1, .subtitle, .btn {
-            opacity: 0; /* Изначально скрыты для анимации */
+            opacity: 0;
             animation: fadeInUp 0.8s ease-out forwards;
         }
 
-        /* Задержки для "лесенки" */
-        h1 { animation-delay: 0.2s; font-size: 2rem; margin-bottom: 8px; }
-        .subtitle { animation-delay: 0.4s; color: #888; letter-spacing: 2px; margin-bottom: 30px; }
-        .btn:nth-child(1) { animation-delay: 0.6s; }
-        .btn:nth-child(2) { animation-delay: 0.8s; }
-        .btn:nth-child(3) { animation-delay: 1.0s; }
-
+        h1 { animation-delay: 0.2s; font-size: 2.5rem; margin: 0; text-shadow: 0 0 20px rgba(157, 78, 221, 0.5); }
+        .subtitle { animation-delay: 0.4s; color: #888; letter-spacing: 4px; margin-bottom: 30px; font-size: 0.8rem; text-transform: uppercase; }
+        
         .links { display: grid; gap: 15px; }
+        .links .btn:nth-child(1) { animation-delay: 0.6s; }
+        .links .btn:nth-child(2) { animation-delay: 0.8s; }
+        .links .btn:nth-child(3) { animation-delay: 1.0s; }
 
         .btn {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text);
             text-decoration: none;
             padding: 18px;
-            border-radius: 15px;
-            border: 1px solid rgba(157, 78, 221, 0.1);
-            transition: all 0.4s ease;
-            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
         }
 
         .btn:hover {
             border-color: var(--accent);
-            transform: translateY(-5px);
-            background: rgba(157, 78, 221, 0.1);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            transform: translateY(-3px);
+            background: rgba(157, 78, 221, 0.15);
+            box-shadow: 0 0 25px rgba(157, 78, 221, 0.4);
         }
     </style>
 </head>
 <body>
-    <div class="cursor-glow" id="glow"></div>
+    <canvas id="matrix-canvas"></canvas>
+    <div class="overlay"></div>
+    <div id="glow"></div>
+
     <div class="container">
         <h1>KiaSHi8</h1>
         <div class="subtitle">C# • Python • Kali Linux</div>
@@ -93,11 +117,58 @@
     </div>
 
     <script>
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
         const glow = document.getElementById('glow');
-        document.addEventListener('mousemove', (e) => {
+
+        // Подгонка размера холста
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Настройки символов
+        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>[]{}/\\|!@#$%^&*()";
+        const fontSize = 16;
+        const columns = Math.floor(canvas.width / fontSize);
+        const drops = new Array(columns).fill(0).map(() => Math.random() * canvas.height);
+        
+        // Массив скоростей и размеров для эффекта глубины
+        const layers = new Array(columns).fill(0).map(() => ({
+            speed: Math.random() * 2 + 1,
+            size: Math.random() * 10 + 10,
+            opacity: Math.random() * 0.3 + 0.1
+        }));
+
+        function draw() {
+            ctx.fillStyle = "rgba(10, 10, 10, 0.1)"; // Полупрозрачный фон для эффекта хвоста
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                const layer = layers[i];
+                
+                ctx.font = layer.size + "px monospace";
+                ctx.fillStyle = `rgba(157, 78, 221, ${layer.opacity})`; // Фиолетовый с разной прозрачностью
+                
+                ctx.fillText(text, i * fontSize, drops[i]);
+
+                if (drops[i] > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i] += fontSize * (layer.speed * 0.5);
+            }
+        }
+
+        setInterval(draw, 33);
+
+        window.addEventListener('mousemove', (e) => {
             glow.style.left = e.clientX + 'px';
             glow.style.top = e.clientY + 'px';
         });
     </script>
 </body>
 </html>
+
