@@ -82,6 +82,19 @@
             text-shadow: 0 0 20px rgba(157, 78, 221, 0.5); 
             cursor: pointer;
         }
+                .subtitle { 
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+            animation-delay: 0.4s; 
+            color: #888; /* Серый цвет */
+            letter-spacing: 4px; /* Расстояние между буквами */
+            margin-bottom: 30px; 
+            font-size: 0.8rem; 
+            text-transform: uppercase; /* Все буквы станут ЗАГЛАВНЫМИ */
+            user-select: none; /* Нельзя выделить */
+            -webkit-user-select: none;
+        }
+
 
         /* Эффект Glitch при наведении */
         h1::before, h1::after {
