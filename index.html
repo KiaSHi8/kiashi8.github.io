@@ -151,7 +151,7 @@
                 const layer = layers[i];
                 
                 ctx.font = layer.size + "px monospace";
-                ctx.fillStyle = `rgba(157, 78, 221, ${layer.opacity})`; // Фиолетовый с разной прозрачностью
+                ctx.fillStyle = `rgba(157, 78, 221, 0.8)`; // Фиолетовый с разной прозрачностью
                 
                 ctx.fillText(text, i * fontSize, drops[i]);
 
