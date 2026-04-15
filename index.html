@@ -6,6 +6,17 @@
     <title>KiaSHi8 | Developer</title>
 <link rel="icon" href="favicon.png" type="image/png">
     <style>
+                .system-status {
+            margin-top: 40px;
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: rgba(157, 78, 221, 0.5); /* Полупрозрачный фиолетовый */
+            letter-spacing: 1px;
+            user-select: none;
+            text-transform: uppercase;
+            transition: opacity 0.5s ease;
+        }
+
         :root {
             --accent: #9d4edd; 
             --text: #ededed;
@@ -179,6 +190,8 @@
     <a class="btn" href="https://github.com/KiaSHi8/Military-Rank-Trainer" target="_blank">Military Trainer</a>
     <a class="btn" href="https://github.com/KiaSHi8/Py-Network-Scanner" target="_blank">Network Scanner</a>
     <a class="btn" href="https://t.me/Osu_Kioshi8" target="_blank">Telegram Channel</a>
+                <div class="system-status" id="status-text">[SYSTEM]: INITIALIZATION...</div>
+
 </div>
 
         </div>
@@ -236,6 +249,28 @@
             glow.style.left = e.clientX + 'px';
             glow.style.top = e.clientY + 'px';
         });
+                const statusElement = document.getElementById('status-text');
+        const statuses = [
+            "[SYSTEM]: LOADING JAVA MODULES... 75%",
+            "[STATUS]: LEARNING DOCKER ARCHITECTURE",
+            "[INFO]: SCANNING NETWORK FOR VULNERABILITIES",
+            "[SYSTEM]: KIASHI8 SECURITY ACTIVE",
+            "[DEBUG]: HTML/CSS STRUCTURE OPTIMIZED",
+            "[POWER]: KALI LINUX ENVIRONMENT READY"
+        ];
+        let currentStatusIndex = 0;
+
+        function updateStatus() {
+            statusElement.style.opacity = 0; // Плавно гасим
+            setTimeout(() => {
+                currentStatusIndex = (currentStatusIndex + 1) % statuses.length;
+                statusElement.innerText = statuses[currentStatusIndex];
+                statusElement.style.opacity = 1; // Плавно проявляем новую фразу
+            }, 500);
+        }
+
+        setInterval(updateStatus, 4000); // Смена каждые 4 секунды
+
     </script>
 </body>
 </html>
