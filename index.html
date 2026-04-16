@@ -212,7 +212,7 @@
                 const text = characters.charAt(Math.floor(Math.random() * characters.length));
                 const layer = layers[i];
                 ctx.font = layer.size + "px monospace";
-                ctx.fillStyle = "rgba(157, 78, 221, 0.95)"; 
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent'); 
                 ctx.fillText(text, i * fontSize, drops[i]);
 
                 if (drops[i] > canvas.height && Math.random() > 0.975) {
@@ -256,38 +256,50 @@ const interval = setInterval(() => {
     
     iteration += 1 / 3; // Скорость появления (чем меньше число, тем медленнее)
 }, 30);
-        // ПАСХАЛКА "HACK"
+        
+// --- ФИНАЛЬНАЯ ПАСХАЛКА "HACK" ---
 let inputBuffer = "";
+let isHacking = false;
+
 window.addEventListener('keydown', (e) => {
+    if (isHacking) return; // Игнорируем нажатия, пока идет эффект
+    
     inputBuffer += e.key.toLowerCase();
-    if (inputBuffer.length > 4) inputBuffer = inputBuffer.substring(inputBuffer.length - 4);
+    
+    // Держим в буфере только последние 4 символа
+    if (inputBuffer.length > 4) {
+        inputBuffer = inputBuffer.substring(inputBuffer.length - 4);
+    }
 
     if (inputBuffer === "hack") {
-        // 1. Меняем цвета на красный
+        isHacking = true;
+        
+        // 1. Активируем КРАСНЫЙ РЕЖИМ
         document.documentElement.style.setProperty('--accent', '#ff0000');
         glow.style.background = "radial-gradient(circle, rgba(255, 0, 0, 0.4) 0%, rgba(0,0,0,0) 70%)";
         
-        // 2. Пугаем пользователя в статусе
-        const oldStatus = statusElement.innerText;
         statusElement.style.color = "#ff0000";
         statusElement.innerText = "[CRITICAL ERROR]: SYSTEM COMPROMISED";
 
-        // 3. Ускоряем матрицу (опционально, создаем хаос)
-        const originalLayers = [...layers];
-        layers.forEach(l => { l.speed *= 5; });
+        // 2. Резко ускоряем дождь
+        layers.forEach(l => { l.speed *= 8; });
 
-        // 4. Через 3 секунды возвращаем всё как было
+        // 3. ОТКАТ (через 4 секунды возвращаем всё в норму)
         setTimeout(() => {
+            // Возвращаем фиолетовый акцент
             document.documentElement.style.setProperty('--accent', '#9d4edd');
             glow.style.background = "radial-gradient(circle, rgba(157, 78, 221, 0.2) 0%, rgba(0,0,0,0) 70%)";
+            
+            // Восстанавливаем статус
             statusElement.style.color = "rgba(157, 78, 221, 0.5)";
             statusElement.innerText = "[SYSTEM]: RECOVERED";
-            layers.forEach((l, i) => { l.speed = originalLayers[i].speed; });
-            inputBuffer = ""; // Очищаем буфер
-        }, 3000);
+            
+            // Возвращаем нормальную скорость дождя
+            layers.forEach(l => { l.speed /= 8; });
+            
+            // Сбрасываем флаги
+            inputBuffer = ""; 
+            isHacking = false;
+        }, 4000);
     }
 });
-
-    </script>
-</body>
-</html>
