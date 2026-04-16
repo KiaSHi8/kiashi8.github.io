@@ -256,6 +256,38 @@ const interval = setInterval(() => {
     
     iteration += 1 / 3; // Скорость появления (чем меньше число, тем медленнее)
 }, 30);
+        // ПАСХАЛКА "HACK"
+let inputBuffer = "";
+window.addEventListener('keydown', (e) => {
+    inputBuffer += e.key.toLowerCase();
+    if (inputBuffer.length > 4) inputBuffer = inputBuffer.substring(inputBuffer.length - 4);
+
+    if (inputBuffer === "hack") {
+        // 1. Меняем цвета на красный
+        document.documentElement.style.setProperty('--accent', '#ff0000');
+        glow.style.background = "radial-gradient(circle, rgba(255, 0, 0, 0.4) 0%, rgba(0,0,0,0) 70%)";
+        
+        // 2. Пугаем пользователя в статусе
+        const oldStatus = statusElement.innerText;
+        statusElement.style.color = "#ff0000";
+        statusElement.innerText = "[CRITICAL ERROR]: SYSTEM COMPROMISED";
+
+        // 3. Ускоряем матрицу (опционально, создаем хаос)
+        const originalLayers = [...layers];
+        layers.forEach(l => { l.speed *= 5; });
+
+        // 4. Через 3 секунды возвращаем всё как было
+        setTimeout(() => {
+            document.documentElement.style.setProperty('--accent', '#9d4edd');
+            glow.style.background = "radial-gradient(circle, rgba(157, 78, 221, 0.2) 0%, rgba(0,0,0,0) 70%)";
+            statusElement.style.color = "rgba(157, 78, 221, 0.5)";
+            statusElement.innerText = "[SYSTEM]: RECOVERED";
+            layers.forEach((l, i) => { l.speed = originalLayers[i].speed; });
+            inputBuffer = ""; // Очищаем буфер
+        }, 3000);
+    }
+});
+
     </script>
 </body>
 </html>
