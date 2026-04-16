@@ -109,7 +109,7 @@
 
         .links { display: grid; gap: 15px; }
 
-        .btn {
+                .btn {
             background: rgba(255, 255, 255, 0.05);
             color: var(--text);
             text-decoration: none;
@@ -120,15 +120,25 @@
             backdrop-filter: blur(5px);
             animation: fadeInUp 0.8s ease-out forwards;
             opacity: 0;
+            display: block; /* Чтобы кнопка была кликабельной по всей площади */
         }
 
+        /* Общий ховер для всех кнопок (фиолетовый по умолчанию) */
         .btn:hover {
             border-color: var(--accent);
-            transform: translateY(-5px) scale(1.07);
+            transform: translateY(-5px) scale(1.07) !important; /* !important теперь тут */
             background: rgba(157, 78, 221, 0.2);
             box-shadow: 0 0 25px rgba(157, 78, 221, 0.6);
             color: white;
         }
+
+        /* Синий ховер специально для кнопки ТГ */
+        .btn-tg:hover {
+            background: rgba(38, 165, 228, 0.2) !important;
+            box-shadow: 0 0 25px rgba(38, 165, 228, 0.8) !important;
+            border-color: var(--tg-color) !important;
+        }
+
 
         /* СПЕЦИАЛЬНАЯ КНОПКА ТЕЛЕГРАМ */
         @keyframes tg-pulse {
